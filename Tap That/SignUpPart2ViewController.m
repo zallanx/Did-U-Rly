@@ -7,6 +7,7 @@
 //
 
 #import "SignUpPart2ViewController.h"
+#include <stdlib.h>
 
 #define UIColorFromRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
 
@@ -121,6 +122,7 @@
                     [self associatePFInstallation];
                     [self associateUserTapsSentCount];
                     [self associateBirthdateWithCurrentUser];
+                    [self associateDefaultAvatar];
                     
                     [self.navigationController popToRootViewControllerAnimated:NO]; //Goes back to inbox
                     
@@ -187,7 +189,8 @@
             //- Save Facebook information to Parse
             PFUser *currentUser = [PFUser currentUser];
             [currentUser setObject:facebookID forKey:@"fbID"];
-            [currentUser setObject:[NSString stringWithFormat:@"%@, %@", userLastName, userFirstName] forKey:@"fbFullName"];
+            [currentUser setObject:userFirstName forKey:@"fbFirstName"];
+            [currentUser setObject:userLastName  forKey:@"fbLastName"];
             [currentUser setObject:birthDate forKey:@"birthdate"];
             [currentUser setObject:gender forKey:@"fbGender"];
             
@@ -199,6 +202,15 @@
 
     }];
 
+}
+
+- (void)associateDefaultAvatar
+{
+    int r = (arc4random() % 9) + 1;
+    NSNumber *avatarImageIndex = [NSNumber numberWithInt:r];
+    PFUser *currentUser = [PFUser currentUser];
+    [currentUser setObject:avatarImageIndex forKey:@"avatarImageIndex"];
+    [currentUser saveInBackground];
 }
 
 -(void)storeFBProfilePictureURLS

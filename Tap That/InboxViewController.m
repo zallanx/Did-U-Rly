@@ -251,8 +251,10 @@
                     [self associateGameWithCurrentUser:game];
                     self.currentGame = game;
                     NSLog(@"the current game is %@", self.currentGame);
-                    
-                    
+                    if ([self.currentUser objectForKey:@"fbID"]){ //if user logged in using Facebook
+                        [self associateUserToFBID:game];
+                    }
+                    [self associateAvatarToUsernameForGame:game];
                     [self performSegueWithIdentifier:@"newGamePrompt" sender:self];
 
                 }
@@ -280,6 +282,32 @@
     }];
 }
 
+- (void)associateUserToFBID: (PFObject *)game
+{
+    NSMutableDictionary *usernameForFBIDInGame = [[NSMutableDictionary alloc] initWithDictionary:game[@"usernameForFBIDInGame"]];
+    NSLog(@"The retrived dicionary is %@", usernameForFBIDInGame);
+    [usernameForFBIDInGame setObject:self.currentUser[@"fbID"] forKey:self.currentUser.username];
+    NSLog(@"The new dicionary is %@", usernameForFBIDInGame);
+    [game setObject:usernameForFBIDInGame forKey:@"usernameForFBIDInGame"];
+    [game saveInBackground];
+}
+
+- (void)associateAvatarToUsernameForGame: (PFObject *)game
+{
+    NSMutableDictionary *usernameForFBIDInGame = [[NSMutableDictionary alloc] initWithDictionary:game[@"usernameForAvatarInGame"]];
+    NSString *imageName;
+    if ([self.currentUser objectForKey:@"fbID"]){//if user is a facebook user
+        NSArray *arrayOfProfileURLs = [self.currentUser objectForKey:@"fbProfilePictures"];
+        imageName = [arrayOfProfileURLs firstObject];
+    } else { //if email user
+        NSNumber *indexOfAvatar = [self.currentUser objectForKey:@"avatarImageIndex"];
+        imageName = [NSString stringWithFormat:@"user%@", indexOfAvatar];
+    }
+    [usernameForFBIDInGame setObject:imageName forKey:self.currentUser.username];
+    [game setObject:usernameForFBIDInGame forKey:@"usernameForAvatarInGame"];
+    [game saveInBackground];
+}
+
 /*
 - (void)updateTurnAndReward: (NSDictionary *)turnAndReward forGame: (PFObject *)game
 {
@@ -295,7 +323,7 @@
 {
     InboxViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
     //NSLog(@"My turn games count %i", self.myTurnGames.count);
-    cell.turnLabel.hidden = NO;
+    //cell.turnLabel.hidden = NO;
     cell.invitationView.hidden = NO;
     
     if (self.myGames.count > 0){
@@ -305,13 +333,14 @@
             PFObject *game = (PFObject *)myGame;
             if ([self hasCurrentUserJoinedGame:game] == YES){
                 NSString *allPlayersInGame = [self getAllPlayers:game];
-               
+                
                 cell.invitationView.hidden = YES;
                 cell.majorLabel.text = allPlayersInGame;
                 cell.minorLabel.text = nil;
-                cell.turnLabel.text = nil;
-                cell.turnImageView.image = nil;
-                cell.actionTurnLabel.text = nil;
+                //cell.turnLabel.text = nil;
+                //cell.turnImageView.image = nil;
+                //cell.actionTurnLabel.text = nil;
+                [self cycleThroughUsernamesToGetSetAvatar:game andCell:cell];
                 
             } else {
                 
@@ -320,9 +349,9 @@
                 
                 cell.majorLabel.text = @"You were invited to join a game";
                 cell.minorLabel.text = nil;
-                cell.turnLabel.text = nil;
-                cell.turnImageView.image = nil;
-                cell.actionTurnLabel.text = nil;
+                //cell.turnLabel.text = nil;
+                //cell.turnImageView.image = nil;
+                //cell.actionTurnLabel.text = nil;
             }
         
         } else {
@@ -331,14 +360,43 @@
             cell.invitationView.hidden = YES;
             cell.majorLabel.text = addGame[@"title"];
             cell.minorLabel.text = nil;
-            cell.turnLabel.text = nil;
-            cell.turnImageView.image = nil;
-            cell.actionTurnLabel.text = nil;
+            //cell.turnLabel.text = nil;
+            //cell.turnImageView.image = nil;
+            //cell.actionTurnLabel.text = nil;
             
         }
     }
     
     return cell;
+}
+
+- (void)cycleThroughUsernamesToGetSetAvatar: (PFObject *)game andCell: (InboxViewCell *)cell
+{
+    NSArray *usernamesInGame = game[@"userNamesInGame"];
+    int i = 0;
+    for (NSString *username in usernamesInGame){
+        NSDictionary *usernameForImage = [game objectForKey:@"usernameForAvatarInGame"];
+        NSString *imageName = [usernameForImage objectForKey:username];
+        if (imageName.length > 8){
+            //Is facebook image
+            imageName = @"user10";
+        }
+        
+        //sets it to the UIImages of the cell
+        if (i == 0){
+            cell.profileView1.image = [UIImage imageNamed:imageName];
+        }
+        
+        if (i == 1){
+            cell.profileView2.image = [UIImage imageNamed:imageName];
+        }
+        
+        if (i == 2){
+            cell.profileView3.image = [UIImage imageNamed:imageName];
+        }
+        
+        i++;
+    }
 }
 
 
@@ -483,7 +541,11 @@
     PFObject *game = [self.myGames objectAtIndex:indexPath.row];
     self.selectedGame = game;
     [self associateGameWithCurrentUser:game];
-    //[self trackGameMessagesCount:game];
+    if ([self.currentUser objectForKey:@"fbID"]){ //if user logged in using Facebook
+        [self associateUserToFBID:game];
+        
+    }
+    [self associateAvatarToUsernameForGame:game];
     [self performSegueWithIdentifier:@"viewGameMessages" sender:self];
     
 }

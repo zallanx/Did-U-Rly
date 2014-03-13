@@ -55,7 +55,7 @@
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
                                                 <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G7G-N1-Hc3">
-                                                    <rect key="frame" x="37" y="119" width="246" height="119"/>
+                                                    <rect key="frame" x="37" y="40" width="246" height="119"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <subviews>
                                                         <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yZ0-Pv-BpX">
@@ -95,6 +95,9 @@
                                             <outlet property="invitationView" destination="G7G-N1-Hc3" id="IsU-Tb-NLL"/>
                                             <outlet property="majorLabel" destination="VMK-db-dXK" id="7ih-fs-1Df"/>
                                             <outlet property="minorLabel" destination="WGu-pc-T1H" id="pWe-6C-dkB"/>
+                                            <outlet property="profileView1" destination="nSs-rf-b63" id="TyV-Zw-Dpy"/>
+                                            <outlet property="profileView2" destination="cR1-Xb-nHJ" id="XfE-bD-G7O"/>
+                                            <outlet property="profileView3" destination="dSx-Qc-Iit" id="I5I-Un-3uU"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
