@@ -8,6 +8,8 @@
 
 #import "DidTheyReallyViewController.h"
 #import "ImageViewController.h"
+#import "UIImageView+AFNetworking.h"
+
 
 @interface DidTheyReallyViewController ()
 
@@ -28,14 +30,31 @@
     [super viewWillAppear:animated];
     [self setupLabels];
      NSLog(@"Current game IN DID THEY REALLY %@", self.currentGame);
-    //!In future, when setting is already set , say something like You selected Yes - did you want to change your mind?
+    [self setAvatarPicture];
     
+}
+
+- (void)setAvatarPicture
+{
+    self.avatarImageview.layer.cornerRadius = self.avatarImageview.frame.size.height/2;
+    self.avatarImageview.clipsToBounds = YES;
+    
+    if ([self.message objectForKey:@"senderFBPicture"]){
+        NSString *url = [self.message objectForKey:@"senderFBPicture"];
+        NSURL *pictureURL = [NSURL URLWithString:url];
+        [self.avatarImageview setImageWithURL:pictureURL];
+    } else if ([self.message objectForKey:@"senderAvatarImage"]){
+        NSNumber *avatarIndex = [self.message objectForKey:@"senderAvatarImage"];
+        NSString *imageName = [NSString stringWithFormat:@"user%@", avatarIndex];
+        self.avatarImageview.image = [UIImage imageNamed:imageName];
+    }
+
 }
 
 - (void)setupLabels
 {
     NSString *messageSender = self.message[@"senderUsername"];
-    self.usernameLabel.text = [NSString stringWithFormat:@"Did %@ really take a photo of", messageSender];
+    //self.usernameLabel.text = [NSString stringWithFormat:@"Did %@ really take a photo of", messageSender];
     
     NSDictionary *promptForShell = self.message[@"messagePromptForShell"];
     NSString *prompt = [[promptForShell allKeys] lastObject];
@@ -48,7 +67,7 @@
     {
         prompt = [prompt stringByReplacingOccurrencesOfString:[aList objectAtIndex:i] withString:[bList objectAtIndex:i]];
     }
-    self.taskLabel.text = prompt;
+    //self.taskLabel.text = prompt;
     
 }
 

@@ -12,9 +12,11 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *majorLabel;
 @property (weak, nonatomic) IBOutlet UILabel *minorLabel;
+
 @property (weak, nonatomic) IBOutlet UIImageView *profileView1;
 @property (weak, nonatomic) IBOutlet UIImageView *profileView2;
 @property (weak, nonatomic) IBOutlet UIImageView *profileView3;
+
 
 
 //Join or decline view and buttons

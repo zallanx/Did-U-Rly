@@ -82,8 +82,9 @@
     // ---- Add cell for newGame
     
     [self populateGamesFromParse];
-
 }
+
+
 
 - (void)startGameWithUser
 {
@@ -238,6 +239,7 @@
             [game setObject:userNamesInGame forKey:@"userNamesInGame"];
             [game setObject:rankingInGame forKey:@"userRankingInGame"];
             [game setObject:shellsInGame forKey:@"userShellsInGame"];
+            [game setObject:self.currentUser.username forKey:@"gameCreator"];
             
             
             
@@ -253,6 +255,7 @@
                     NSLog(@"the current game is %@", self.currentGame);
                     if ([self.currentUser objectForKey:@"fbID"]){ //if user logged in using Facebook
                         [self associateUserToFBID:game];
+                        [self associateFirstNameToUsernameForGame:game];
                     }
                     [self associateAvatarToUsernameForGame:game];
                     [self performSegueWithIdentifier:@"newGamePrompt" sender:self];
@@ -292,13 +295,20 @@
     [game saveInBackground];
 }
 
+- (void)associateFirstNameToUsernameForGame: (PFObject *)game
+{
+    NSMutableDictionary *usernameForFirstNameInGame = [[NSMutableDictionary alloc] initWithDictionary:game[@"usernameForFirstNameInGame"]];
+    [usernameForFirstNameInGame setObject:self.currentUser[@"fbFirstName"] forKey:self.currentUser.username];
+    [game setObject:usernameForFirstNameInGame forKey:@"usernameForFirstNameInGame"];
+    [game saveInBackground];
+}
+
 - (void)associateAvatarToUsernameForGame: (PFObject *)game
 {
     NSMutableDictionary *usernameForFBIDInGame = [[NSMutableDictionary alloc] initWithDictionary:game[@"usernameForAvatarInGame"]];
     NSString *imageName;
     if ([self.currentUser objectForKey:@"fbID"]){//if user is a facebook user
-        NSArray *arrayOfProfileURLs = [self.currentUser objectForKey:@"fbProfilePictures"];
-        imageName = [arrayOfProfileURLs firstObject];
+        imageName = [self.currentUser objectForKey:@"fbProfilePicture"];
     } else { //if email user
         NSNumber *indexOfAvatar = [self.currentUser objectForKey:@"avatarImageIndex"];
         imageName = [NSString stringWithFormat:@"user%@", indexOfAvatar];
@@ -307,6 +317,7 @@
     [game setObject:usernameForFBIDInGame forKey:@"usernameForAvatarInGame"];
     [game saveInBackground];
 }
+
 
 /*
 - (void)updateTurnAndReward: (NSDictionary *)turnAndReward forGame: (PFObject *)game
@@ -336,11 +347,11 @@
                 
                 cell.invitationView.hidden = YES;
                 cell.majorLabel.text = allPlayersInGame;
-                cell.minorLabel.text = nil;
                 //cell.turnLabel.text = nil;
                 //cell.turnImageView.image = nil;
                 //cell.actionTurnLabel.text = nil;
                 [self cycleThroughUsernamesToGetSetAvatar:game andCell:cell];
+                [self setDateForGame:game andCell:cell];
                 
             } else {
                 
@@ -370,6 +381,16 @@
     return cell;
 }
 
+- (void)setDateForGame: (PFObject *)game andCell: (InboxViewCell *)cell
+{
+    //Sets the subtext element with date and subMessage
+    NSDate *date = [[NSDate alloc] init];
+    date = game.updatedAt;
+    NSString *ago = [date timeAgo];
+
+    cell.minorLabel.text = [NSString stringWithFormat:@"Latest activity: %@", ago];
+}
+
 - (void)cycleThroughUsernamesToGetSetAvatar: (PFObject *)game andCell: (InboxViewCell *)cell
 {
     NSArray *usernamesInGame = game[@"userNamesInGame"];
@@ -380,6 +401,10 @@
         if (imageName.length > 8){
             //Is facebook image
             imageName = @"user10";
+        } else if (!imageName){
+            NSLog(@"%@ hasn't joined game yet", username);
+            imageName = @"userInvited";
+            
         }
         
         //sets it to the UIImages of the cell
@@ -487,10 +512,20 @@
     NSArray *playersInGame = [NSArray arrayWithArray:game[@"userNamesInGame"]];
    
     for (int i = 0; i < playersInGame.count; i++){
+        NSString *username = [playersInGame objectAtIndex:i];
         if (i == 0){
-            [allPlayers appendString:[playersInGame objectAtIndex:i]];
+            if ([[game objectForKey:@"usernameForFirstNameInGame"] objectForKey:username]){ //If a first name exists for this username
+                [allPlayers appendString:[[game objectForKey:@"usernameForFirstNameInGame"] objectForKey:username]];
+            } else {
+                [allPlayers appendString:username];
+            }
         } else {
-            [allPlayers appendString:[NSString stringWithFormat:@", %@", [playersInGame objectAtIndex:i]]];
+            if ([[game objectForKey:@"usernameForFirstNameInGame"] objectForKey:username]){ //If a first name exists for this username
+                [allPlayers appendString:[NSString stringWithFormat:@", %@", [[game objectForKey:@"usernameForFirstNameInGame"] objectForKey:username]]];
+            } else {
+                [allPlayers appendString:[NSString stringWithFormat:@", %@", username]];
+            }
+ 
         }
     }
     return allPlayers;
@@ -543,6 +578,7 @@
     [self associateGameWithCurrentUser:game];
     if ([self.currentUser objectForKey:@"fbID"]){ //if user logged in using Facebook
         [self associateUserToFBID:game];
+        [self associateFirstNameToUsernameForGame:game];
         
     }
     [self associateAvatarToUsernameForGame:game];

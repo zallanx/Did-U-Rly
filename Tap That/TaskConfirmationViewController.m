@@ -63,6 +63,7 @@
     NSData *fileDataForImage1 = UIImageJPEGRepresentation(image1New, 80);
     NSString *fileNameForImage1 = @"image.jpg";
     PFFile *fileForImage1 = [PFFile fileWithName:fileNameForImage1 data:fileDataForImage1];
+    PFUser *currentUser = [PFUser currentUser];
     
     [fileForImage1 saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
         if (error){
@@ -82,6 +83,16 @@
             [message setObject:self.currentGame.objectId forKey:@"gameBelongingTo"];  //Associate message with the game
             [message setObject:[PFUser currentUser].username forKey:@"senderUsername"];
             [message setObject:[PFUser currentUser].objectId forKey:@"senderUserID"];
+            
+            NSString *imageURL = [currentUser objectForKey:@"fbProfilePicture"];
+            NSNumber *avatarIndex = [currentUser objectForKey:@"avatarImageIndex"];
+            if (imageURL.length > 0){
+                //indeed FB
+                [message setObject:imageURL forKey:@"senderFBPicture"];
+            } else {
+                [message setObject:avatarIndex forKey:@"senderAvatarImage"];
+            }
+            
             [message setObject:@"active" forKey:@"status"];
             [message addObject:[PFUser currentUser].username forKey:@"imageViewedBy"];
             

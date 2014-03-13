@@ -8,49 +8,31 @@
 		<dict>
 			<key>isShown</key>
 			<false/>
-			<key>orderHint</key>
-			<integer>2</integer>
 		</dict>
 		<key>Pods-NSDate+TimeAgo.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
-			<key>orderHint</key>
-			<integer>3</integer>
-		</dict>
-		<key>Pods-WYPopoverController.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-			<key>orderHint</key>
-			<integer>4</integer>
 		</dict>
 		<key>Pods.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
-			<key>orderHint</key>
-			<integer>1</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>28BD517D10F64838AF96875B</key>
+		<key>2D8919486D2F4B549721D176</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>311F25C2387B43DDA48B2AA1</key>
+		<key>948EAB00A54041EDBA9B56DF</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>448C35AD6B27496B84DDE8FB</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>8B1C9D2BA59E407F9654D698</key>
+		<key>9624FC64AAD040D4B1DA383B</key>
 		<dict>
 			<key>primary</key>
 			<true/>

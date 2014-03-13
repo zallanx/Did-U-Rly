@@ -14,10 +14,11 @@
 @property (strong, nonatomic) PFObject *currentGame;
 @property (strong, nonatomic) PFObject *message;
 @property (strong, nonatomic) NSString *userDecision;
-@property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
-@property (weak, nonatomic) IBOutlet UILabel *taskLabel;
+
 - (IBAction)yesButtonTapped:(UIButton *)sender;
 - (IBAction)noButtonTapped:(UIButton *)sender;
+
+@property (weak, nonatomic) IBOutlet UIImageView *avatarImageview;
 
 
 @end

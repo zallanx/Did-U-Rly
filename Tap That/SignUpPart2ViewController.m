@@ -216,27 +216,35 @@
 -(void)storeFBProfilePictureURLS
 {
     NSString *queryForProfilePicturesFromCurrentUser =
-    @"SELECT owner, src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE name='Profile Pictures' AND owner=me()) LIMIT 4";
-    NSMutableArray *profilePictureArraysToStore = [[NSMutableArray alloc] init];
+    //@"SELECT owner, src_big FROM photo WHERE aid IN ( SELECT aid FROM album WHERE name='Profile Pictures' AND owner=me()) LIMIT 4";
+    //@"SELECT pic_crop FROM profile WHERE id = me()";
+    @"SELECT url, real_width, real_height FROM profile_pic WHERE id = me() AND width=200 AND height=200";
+    
     NSDictionary *queryParam = @{ @"q": queryForProfilePicturesFromCurrentUser };
     [FBRequestConnection startWithGraphPath:@"/fql" parameters:queryParam HTTPMethod:@"GET" completionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
-        if(!error){
-            NSArray *parsedResultData = [result objectForKey:@"data"]; //result is natively a dictionary, 4 dictionaries inside.  gets those 4 inside an array
-            for (NSDictionary *eachPictureDictionary in parsedResultData){
-                NSString *pictureURLString = [eachPictureDictionary objectForKey:@"src_big"];
-                [profilePictureArraysToStore addObject:pictureURLString];
-            }
-            
+        if(error){
+            NSLog(@"Error %@", error);
         } else {
-            NSLog(@"Error: %@", [error localizedDescription]);
+            NSDictionary *resultDictionary = (NSDictionary *)result;
+            NSArray *dataObject = [resultDictionary objectForKey:@"data"];
+            NSDictionary *dataInsideOBject = [dataObject firstObject];
+            NSString *urlOfSquarePic = [dataInsideOBject objectForKey:@"url"];
+            
+            PFUser *currentUser = [PFUser currentUser];
+            [currentUser setObject:urlOfSquarePic forKey:@"fbProfilePicture"];
+            [currentUser saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if (error){
+                    
+                } else {
+                    NSLog(@"Pictures stored!");
+                }
+            }];
+            
+            
         }
         
-        //- After populating queryForProfilePicturesFromCurrentUser, save it to Parse
-        PFUser *currentUser = [PFUser currentUser];
-        [currentUser setObject:profilePictureArraysToStore forKey:@"fbProfilePictures"];
-        [currentUser saveInBackground];
     }];
-    NSLog(@"Pictures stored!");
+    
 }
 
 -(void) getListOfFriends

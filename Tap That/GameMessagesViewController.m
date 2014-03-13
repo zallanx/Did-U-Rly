@@ -190,6 +190,20 @@
     cell.rankLabel.text = stringRank;
     cell.accessoryType = UITableViewCellAccessoryNone;
     
+    if ([self.currentGame[@"usernameForAvatarInGame"] objectForKey:username]){
+        NSString *imageName = [self.currentGame[@"usernameForAvatarInGame"] objectForKey:username];
+        if (imageName.length > 8){
+            //Is facebook link
+            imageName = @"user10";
+        }
+        cell.avatarImageView.image = [UIImage imageNamed:imageName];
+        
+        
+    } else {
+        cell.avatarImageView.image = [UIImage imageNamed:@"userInvited"];
+    }
+    
+    
     if ([self.userForMessage objectForKey:username]){
         cell.statusLabel.text = @"New";
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
