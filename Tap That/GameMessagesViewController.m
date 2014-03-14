@@ -9,6 +9,7 @@
 #import "GameMessagesViewController.h"
 #import "DidTheyReallyViewController.h"
 #import "TapRewardSelectViewController.h"
+#import "UIImageView+AFNetworking.h"
 
 @interface GameMessagesViewController ()
 
@@ -192,11 +193,15 @@
     
     if ([self.currentGame[@"usernameForAvatarInGame"] objectForKey:username]){
         NSString *imageName = [self.currentGame[@"usernameForAvatarInGame"] objectForKey:username];
-        if (imageName.length > 8){
-            //Is facebook link
-            imageName = @"user10";
+        if (imageName.length > 8){ //is Facebook user
+            cell.avatarImageView.layer.cornerRadius = cell.avatarImageView.frame.size.height/2;
+            cell.avatarImageView.clipsToBounds = YES;
+            NSURL *pictureURL = [NSURL URLWithString:imageName];
+            [cell.avatarImageView setImageWithURL:pictureURL placeholderImage:[UIImage imageNamed:@"userInvited"]];
+            
+        } else { //non Facebook user
+            cell.avatarImageView.image = [UIImage imageNamed:imageName];
         }
-        cell.avatarImageView.image = [UIImage imageNamed:imageName];
         
         
     } else {

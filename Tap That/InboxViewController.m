@@ -12,6 +12,7 @@
 #import "ImageViewController.h"
 #import "GameMessagesViewController.h"
 #import "NSDate+TimeAgo.h"
+#import "UIImageView+AFNetworking.h"
 
 
 @interface InboxViewController ()
@@ -395,12 +396,12 @@
 {
     NSArray *usernamesInGame = game[@"userNamesInGame"];
     int i = 0;
+    BOOL isFacebook = NO;
     for (NSString *username in usernamesInGame){
         NSDictionary *usernameForImage = [game objectForKey:@"usernameForAvatarInGame"];
         NSString *imageName = [usernameForImage objectForKey:username];
         if (imageName.length > 8){
-            //Is facebook image
-            imageName = @"user10";
+            isFacebook = YES;
         } else if (!imageName){
             NSLog(@"%@ hasn't joined game yet", username);
             imageName = @"userInvited";
@@ -409,15 +410,37 @@
         
         //sets it to the UIImages of the cell
         if (i == 0){
-            cell.profileView1.image = [UIImage imageNamed:imageName];
+            if (isFacebook){
+                cell.profileView1.layer.cornerRadius = cell.profileView1.frame.size.height/2;
+                cell.profileView1.clipsToBounds = YES;
+                NSURL *pictureURL = [NSURL URLWithString:imageName];
+                [cell.profileView1 setImageWithURL:pictureURL placeholderImage:[UIImage imageNamed:@"userInvited"]];
+            } else {
+                cell.profileView1.image = [UIImage imageNamed:imageName];
+            }
+
         }
         
         if (i == 1){
-            cell.profileView2.image = [UIImage imageNamed:imageName];
+            if (isFacebook){
+                cell.profileView2.layer.cornerRadius = cell.profileView2.frame.size.height/2;
+                cell.profileView2.clipsToBounds = YES;
+                NSURL *pictureURL = [NSURL URLWithString:imageName];
+                [cell.profileView2 setImageWithURL:pictureURL placeholderImage:[UIImage imageNamed:@"userInvited"]];
+            } else {
+                cell.profileView2.image = [UIImage imageNamed:imageName];
+            }
         }
         
         if (i == 2){
-            cell.profileView3.image = [UIImage imageNamed:imageName];
+            if (isFacebook){
+                cell.profileView3.layer.cornerRadius = cell.profileView3.frame.size.height/2;
+                cell.profileView3.clipsToBounds = YES;
+                NSURL *pictureURL = [NSURL URLWithString:imageName];
+                [cell.profileView3 setImageWithURL:pictureURL placeholderImage:[UIImage imageNamed:@"userInvited"]];
+            } else {
+                cell.profileView3.image = [UIImage imageNamed:imageName];
+            }
         }
         
         i++;
